@@ -55,7 +55,7 @@ void compute_line_data(double n)
         incident_line[i].T = T_ref * (1 - 0.5 * (gamma - 1) * pow((incident_line[i].u / a_ref), 2));
         incident_line[i].a = sqrt(gamma * R * incident_line[i].T);
         incident_line[i].p = p_ref * pow(1 - 0.5 * (gamma - 1) * (incident_line[i].u / a_ref), (2 * gamma / (gamma - 1)));
-        incident_line[i].rho = rho_ref * pow(1 - 0.5 * (gamma - 1) * (incident_line[i].u / a_ref), (2 * gamma / (gamma - 1)));
+        incident_line[i].rho = rho_ref * pow(1 - 0.5 * (gamma - 1) * (incident_line[i].u / a_ref), (2 / (gamma - 1)));
         incident_line[i].J = incident_line[i].u - incident_line[i].a * 2 / (gamma - 1);
     }
 }
