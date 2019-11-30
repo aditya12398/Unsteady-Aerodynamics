@@ -68,11 +68,13 @@ void compute_point(int n)
 {
     for (int i = 0; i < n; i++)
     {
+        //First interaction with the wall. Only u,a, and J are calculated for the time being.
         reflected_line[i].J = -1 * incident_line[i].J;
         reflected_line[i].u = 0;
         reflected_line[i].a = (reflected_line[i].J - incident_line[i].J) * (gamma - 1) / 4;
         for (int j = i + 1; j < n; j++)
         {
+            //Mid-plane interactions beyond the wall. Only u,a, and J are calculated for the time being.
             incident_line[j].u = reflected_line[i].u = (reflected_line[i].J + incident_line[j].J) * 0.5;
             incident_line[j].a = reflected_line[i].a = (reflected_line[i].J - incident_line[j].J) * (gamma - 1) / 4;
             reflected_line[i].J = reflected_line[i].u + reflected_line[i].a * 2 / (gamma - 1);
