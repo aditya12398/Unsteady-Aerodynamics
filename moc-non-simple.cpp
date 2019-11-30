@@ -6,13 +6,14 @@
 #include <string>
 
 //Basic Thermodynamic parameters
-double p3_p4 = 0.2, gamma = 1.4, R = 287.00;
+double p3_p4 = 0.4, gamma = 1.4, R = 287.00;
 double u3, T_ref = 300, a_ref, p_ref, rho_ref = 1.225;
 
 struct characteristic_lines
 {
     int index;
     double slope, u, T, a, p, rho, J;
+    double x1, t1;
 };
 struct characteristic_lines *incident_line, *reflected_line;
 
@@ -34,7 +35,7 @@ void main()
     reflected_line = new characteristic_lines[n];
 
     a_ref = sqrt(gamma * R * T_ref);
-    u3 = (2 * a_ref / (gamma - 1)) * (1 - pow(p3_p4, (2 * gamma / (gamma - 1))));
+    u3 = (2 * a_ref / (gamma - 1)) * (1 - pow(p3_p4, (0.5 * (gamma - 1) / gamma)));
     p_ref = rho_ref * R * T_ref;
     compute_line_data(n);
 }
@@ -42,7 +43,7 @@ void main()
 void compute_line_data(double n)
 {
     double initial_slope, final_slope;
-    initial_slope = - a_ref;
+    initial_slope = -a_ref;
     final_slope = -1 * (a_ref - u3);
 
     for (int i = 0; i < n; i++)
@@ -57,5 +58,25 @@ void compute_line_data(double n)
         incident_line[i].p = p_ref * pow((1 - 0.5 * (gamma - 1) * (incident_line[i].u / a_ref)), (2 * gamma / (gamma - 1)));
         incident_line[i].rho = rho_ref * pow((1 - 0.5 * (gamma - 1) * (incident_line[i].u / a_ref)), (2 / (gamma - 1)));
         incident_line[i].J = incident_line[i].u - incident_line[i].a * 2 / (gamma - 1);
+
+        //Writing x1 and t1 to make the equation of the line
+        incident_line[i].x1 = incident_line[i].t1 = 0;
+    }
+}
+
+void compute_point(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        reflected_line[i].J = -1 * incident_line[i].J;
+        reflected_line[i].u = 0;
+        reflected_line[i].a = (reflected_line[i].J - incident_line[i].J) * (gamma - 1) / 4;
+        for (int j = i + 1; j < n; j++)
+        {
+            incident_line[j].u = reflected_line[i].u = (reflected_line[i].J + incident_line[j].J) * 0.5;
+            incident_line[j].a = reflected_line[i].a = (reflected_line[i].J - incident_line[j].J) * (gamma - 1) / 4;
+            reflected_line[i].J = reflected_line[i].u + reflected_line[i].a * 2 / (gamma - 1);
+            incident_line[j].J = incident_line[j].u - incident_line[j].a * 2 / (gamma - 1);
+        }
     }
 }
