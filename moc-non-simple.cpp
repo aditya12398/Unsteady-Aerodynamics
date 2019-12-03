@@ -70,22 +70,39 @@ void compute_line_data(int n)
 
 void compute_point(int n)
 {
+    double x1 ,t1;
+    double temp1, temp2;
+    double temp3, temp4;
     for (int i = 0; i < n; i++)
     {
         //First interaction with the wall. Only u,a, and J are calculated for the time being.
         reflected_line[i].J = -1 * incident_line[i].J;
         reflected_line[i].u = incident_line[i].u = 0;
         reflected_line[i].a = incident_line[i].a = (reflected_line[i].J - incident_line[i].J) * (gma - 1) / 4;
-        reflected_line[i].slope = reflected_line[i].u + reflected_line[i].u;
+        reflected_line[i].slope = reflected_line[i].u + reflected_line[i].a;
         reflected_line[i].x1 = -1;
         reflected_line[i].t1 = (1 / incident_line[i].slope) * (-1 - incident_line[i].x1) + incident_line[i].t1;
         for (int j = i + 1; j < n; j++)
         {
+            temp1 = incident_line[j].slope * reflected_line[i].x1 - incident_line[j].x1 * reflected_line[i].slope;
+            temp2 = (incident_line[j].slope * reflected_line[i].slope) * (incident_line[j].t1 - reflected_line[i].t1);
+
+            x1 = (temp1 + temp2) / (incident_line[j].slope - reflected_line[i].slope);
+
+            temp3 = reflected_line[i].x1 - incident_line[j].x1;
+            temp4 = (incident_line[j].slope * incident_line[j].t1 - reflected_line[i].slope * reflected_line[i].t1);
+
+            t1 = (temp3 + temp4) / (incident_line[j].slope - reflected_line[i].slope);
             //Mid-plane interactions beyond the wall. Only u,a, and J are calculated for the time being.
             incident_line[j].u = reflected_line[i].u = (reflected_line[i].J + incident_line[j].J) * 0.5;
             incident_line[j].a = reflected_line[i].a = (reflected_line[i].J - incident_line[j].J) * (gma - 1) / 4;
             reflected_line[i].J = reflected_line[i].u + reflected_line[i].a * 2 / (gma - 1);
             incident_line[j].J = incident_line[j].u - incident_line[j].a * 2 / (gma - 1);
+            incident_line[j].slope = incident_line[j].u - incident_line[j].a;
+            reflected_line[i].slope = reflected_line[i].u + reflected_line[i].a;
+
+            incident_line[j].x1 = reflected_line[i].x1 = x1;
+            incident_line[j].t1 = reflected_line[i].t1 = t1;
         }
     }
 }
