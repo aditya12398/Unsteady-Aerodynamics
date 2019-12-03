@@ -82,8 +82,8 @@ void compute_point(int n)
         reflected_line[i].u = incident_line[i].u = 0;
         reflected_line[i].a = incident_line[i].a = (reflected_line[i].J - incident_line[i].J) * (gma - 1) / 4;
         reflected_line[i].slope = reflected_line[i].u + reflected_line[i].a;
-        reflected_line[i].x1 = -1;
-        reflected_line[i].t1 = (1 / incident_line[i].slope) * (-1 - incident_line[i].x1) + incident_line[i].t1;
+        incident_line[i].x1 = reflected_line[i].x1 = -1;
+        incident_line[i].t1 = reflected_line[i].t1 = (1 / incident_line[i].slope) * (-1 - incident_line[i].x1) + incident_line[i].t1;
         write_gnuplot("./Incident_wave.tsv", incident_line[i].x1, incident_line[i].t1, incident_line[i].u, incident_line[i].a, incident_line[i].J);
         write_gnuplot("./Reflected_wave.tsv", reflected_line[i].x1, reflected_line[i].t1, reflected_line[i].u, reflected_line[i].a, reflected_line[i].J);
         for (int j = i + 1; j < n; j++)
@@ -104,10 +104,11 @@ void compute_point(int n)
             incident_line[j].J = incident_line[j].u - incident_line[j].a * 2 / (gma - 1);
             incident_line[j].slope = incident_line[j].u - incident_line[j].a;
             reflected_line[i].slope = reflected_line[i].u + reflected_line[i].a;
+
             incident_line[j].x1 = reflected_line[i].x1 = x1;
             incident_line[j].t1 = reflected_line[i].t1 = t1;
             write_gnuplot("./Incident_wave.tsv", incident_line[j].x1, incident_line[j].t1, incident_line[j].u, incident_line[j].a, incident_line[j].J);
-            write_gnuplot("./Reflected_wave.tsv", reflected_line[i].x1, reflected_line[i].t1, reflected_line[i].u, reflected_line[i].a, reflected_line[i].J);            
+            write_gnuplot("./Reflected_wave.tsv", reflected_line[i].x1, reflected_line[i].t1, reflected_line[i].u, reflected_line[i].a, reflected_line[i].J);
         }
     }
 }
