@@ -20,8 +20,8 @@ struct characteristic_lines *incident_line, *reflected_line;
 
 int main()
 {
-    void compute_point(int);                                         //Function computes the points in x-t plane and changes the data of intersecting characteristic lines
-    void compute_line_data(int);                                     //Function Calculates initial data for all incident characteristic lines
+    void compute_point(int);     //Function computes the points in x-t plane and changes the data of intersecting characteristic lines
+    void compute_line_data(int); //Function Calculates initial data for all incident characteristic lines
     void print_data(int);
 
     int n;
@@ -46,6 +46,7 @@ int main()
 
 void compute_line_data(int n)
 {
+    void write_gnuplot(std::string, double, double, double, double, double); //Functions writes the data such that it can be viewed in GNUPLOT
     double initial_slope, final_slope;
     initial_slope = -a_ref;
     final_slope = -1 * (a_ref - u3);
@@ -65,6 +66,7 @@ void compute_line_data(int n)
 
         //Writing x1 and t1 to make the equation of the line
         incident_line[i].x1 = incident_line[i].t1 = 0;
+        write_gnuplot("./Incident_wave.tsv", incident_line[i].x1, incident_line[i].t1, incident_line[i].u, incident_line[i].a, incident_line[i].J);
     }
 }
 
@@ -72,7 +74,7 @@ void compute_point(int n)
 {
     void write_gnuplot(std::string, double, double, double, double, double); //Functions writes the data such that it can be viewed in GNUPLOT
 
-    double x1 ,t1;
+    double x1, t1;
     double temp1, temp2;
     double temp3, temp4;
     for (int i = 0; i < n; i++)
@@ -82,8 +84,9 @@ void compute_point(int n)
         reflected_line[i].u = incident_line[i].u = 0;
         reflected_line[i].a = incident_line[i].a = (reflected_line[i].J - incident_line[i].J) * (gma - 1) / 4;
         reflected_line[i].slope = reflected_line[i].u + reflected_line[i].a;
+        double temp5 = incident_line[i].x1;
         incident_line[i].x1 = reflected_line[i].x1 = -1;
-        incident_line[i].t1 = reflected_line[i].t1 = (1 / incident_line[i].slope) * (-1 - incident_line[i].x1) + incident_line[i].t1;
+        incident_line[i].t1 = reflected_line[i].t1 = (1 / incident_line[i].slope) * (-1 - temp5) + incident_line[i].t1;
         write_gnuplot("./Incident_wave.tsv", incident_line[i].x1, incident_line[i].t1, incident_line[i].u, incident_line[i].a, incident_line[i].J);
         write_gnuplot("./Reflected_wave.tsv", reflected_line[i].x1, reflected_line[i].t1, reflected_line[i].u, reflected_line[i].a, reflected_line[i].J);
         for (int j = i + 1; j < n; j++)
@@ -110,6 +113,10 @@ void compute_point(int n)
             write_gnuplot("./Incident_wave.tsv", incident_line[j].x1, incident_line[j].t1, incident_line[j].u, incident_line[j].a, incident_line[j].J);
             write_gnuplot("./Reflected_wave.tsv", reflected_line[i].x1, reflected_line[i].t1, reflected_line[i].u, reflected_line[i].a, reflected_line[i].J);
         }
+        x1 = 0;
+        t1 = reflected_line[i].t1 - (reflected_line[i].x1) / reflected_line[i].slope;
+        write_gnuplot("./Reflected_wave.tsv", x1, t1, reflected_line[i].u, reflected_line[i].a, reflected_line[i].J);
+
     }
 }
 void print_data(int n)
@@ -127,7 +134,7 @@ void write_gnuplot(std::string filename, double x, double t, double u, double a,
 {
     std::ofstream outfile;
     outfile.open(filename, std::fstream::app);
-    if (u == 0)// && J > 0)
+    if (u == 0) // && J > 0)
         outfile << std::endl;
     outfile << x << "\t" << t << "\t" << u << "\t" << a << "\t" << J << std::endl;
     //if (u == 0 && J < 0)
