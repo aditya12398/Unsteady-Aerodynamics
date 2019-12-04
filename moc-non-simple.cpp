@@ -8,7 +8,7 @@
 
 //Basic Thermodynamic parameters
 double p3_p4 = 0.4, gma = 1.4, R = 287.00;
-double u3, T_ref = 300, a_ref, p_ref, rho_ref = 1.225;
+double u3, a3, T_ref = 300, a_ref, p_ref, rho_ref = 1.225;
 
 struct characteristic_lines
 {
@@ -37,6 +37,7 @@ int main()
 
     a_ref = sqrt(gma * R * T_ref);
     u3 = (2 * a_ref / (gma - 1)) * (1 - pow(p3_p4, (0.5 * (gma - 1) / gma)));
+    a3 = a_ref - 0.5 * (gma - 1) * u3;
     p_ref = rho_ref * R * T_ref;
     compute_line_data(n);
     compute_point(n);
@@ -49,7 +50,7 @@ void compute_line_data(int n)
     void write_gnuplot(std::string, double, double, double, double, double); //Functions writes the data such that it can be viewed in GNUPLOT
     double initial_slope, final_slope;
     initial_slope = -a_ref;
-    final_slope = -1 * (a_ref - u3);
+    final_slope = -1 * (a3 - u3);
 
     for (int i = 0; i < n; i++)
     {
@@ -116,7 +117,6 @@ void compute_point(int n)
         x1 = 0;
         t1 = reflected_line[i].t1 - (reflected_line[i].x1) / reflected_line[i].slope;
         write_gnuplot("./Reflected_wave.tsv", x1, t1, reflected_line[i].u, reflected_line[i].a, reflected_line[i].J);
-
     }
 }
 void print_data(int n)
